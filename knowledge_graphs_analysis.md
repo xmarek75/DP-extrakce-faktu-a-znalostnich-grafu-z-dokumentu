@@ -81,6 +81,13 @@ Příklad jednoduchých faktů z fiktivní historické listiny:
 
 **Pozor:** tento jednoduchý obrázek nezachycuje, že prodej proběhl jako **jedna událost**, ve které vystupoval prodávající, kupující, věc, místo a datum. To vede k potřebě komplexnějšího modelování.
 
+#### Animace: od historické listiny ke znalostnímu grafu
+
+![Postupné zvýraznění entit v listině a vytvoření grafu prodejní události](docs/images/kg_extraction_pipeline.gif)
+
+*Animace je schematický příklad, nikoliv výstup hotového extraktoru.* Z textu se nejdříve rozpoznají **zmínky o osobách, objektu a místě**. Následně se vytvoří **událost prodeje**, která propojí prodávajícího, kupujícího, předmět, rok a místo. Důležité je nezaměňovat zmínky v textu za jednoznačně identifikované historické entity.
+
+
 ### 2.2 Slovník pojmů
 
 | Pojem | Vysvětlení |
@@ -360,6 +367,13 @@ Jsou to tři zmínky o jedné osobě, dvě osoby, nebo tři různé osoby? Pří
 
 Prozkoumat: NER, coreference, record linkage, entity linking, deduplikaci, aliasy, nejisté propojení a možnost **vrátit chybné sloučení**.
 
+#### Animace: sjednocení zmínek o stejné osobě
+
+![Dvě zmínky v různých listinách a jejich podmíněné sjednocení do jedné entity](docs/images/kg_entity_resolution.gif)
+
+Při propojení záznamů **nestačí shodné nebo podobné jméno**. Algoritmus musí zvážit další důkazy (kontext, role, dataci, místo apod.) a případnou nejistotu zachovat. Animace ukazuje *možné sloučení po ověření*; v reálných datech mohou dvě podobné zmínky označovat **různé osoby**.
+
+
 ### 7.3 Provenance a evidence
 
 Každý výsledek by ideálně obsahoval:
@@ -388,6 +402,13 @@ Rozlišovat:
 
 **Pozor:** confidence skóre modelu nemusí být kalibrovaná pravděpodobnost správnosti. Vhodná je evidence, validace a případně kalibrace.
 
+#### Animace: jak zacházet s rozpornými zdroji
+
+![Dvě historické listiny uvádějí odlišný rok a jsou uchována obě zdrojová tvrzení](docs/images/kg_conflicting_sources.gif)
+
+Pokud listina A uvádí rok **1542** a listina B rok **1547**, systém by neměl bez dalších důkazů jednu variantu prohlásit za pravdivou. Model *claim-centric* uchová **obě tvrzení odděleně**, spolu s jejich zdroji a stavem ověření. Konečné rozhodnutí může vyžadovat další prameny či lidskou revizi.
+
+
 ### 7.5 Časové vztahy
 
 Uvažovat alespoň čtyři různé časy:
@@ -412,6 +433,9 @@ Co když dojde k opravě OCR, změně modelu, ruční revizi nebo přidání nov
 ---
 
 ## 8. Navrhovaná extrakční pipeline
+
+> **Vizualizace jednotlivých kroků:** [Animace extrakce a vytvoření grafu](#animace-od-historické-listiny-ke-znalostnímu-grafu) v části 2.1. Animace zjednodušuje pořadí kroků pro názornost, není povinnou architekturou systému.
+
 
 ```text
 PDF / sken / digitální dokument
@@ -953,3 +977,6 @@ Hledat zejména v **ACL Anthology, ACM Digital Library, IEEE Xplore, SpringerLin
 ---
 
 *Dokument je živý pracovní plán. Každé odborné tvrzení později podložit literaturou nebo experimentem; průběžně oddělovat ověřená zjištění, hypotézy a návrhová rozhodnutí.*
+
+
+<!-- Animované ukázky jsou součástí repozitáře v docs/images/. Znovuvytvoření: node scripts/generate_kg_animations.js -->
