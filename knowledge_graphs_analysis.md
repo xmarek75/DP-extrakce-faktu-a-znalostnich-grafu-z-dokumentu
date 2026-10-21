@@ -11,7 +11,7 @@
 2. [Základní pojmy](#2-základní-pojmy)
 3. [Proč uvažovat o znalostním grafu](#3-proč-uvažovat-o-znalostním-grafu)
 4. [Přehled reprezentací](#4-přehled-reprezentací)
-5. [Datové modely znalostních grafů](#5-datové-modely-znalostních-grafů)
+5. [Datové modely znalostních grafů](#5-datové-modely-znalostních-grafů) — včetně [správného zápisu, serializace a validace](#54-správný-zápis-syntaxe-sémantika-a-validace)
 6. [Ontologie, sémantika a standardy](#6-ontologie-sémantika-a-standardy)
 7. [Specifika faktů extrahovaných z dokumentů](#7-specifika-faktů-extrahovaných-z-dokumentů)
 8. [Navrhovaná extrakční pipeline](#8-navrhovaná-extrakční-pipeline)
@@ -49,6 +49,7 @@ Vedoucí zadal jako první úkol **podrobnou analýzu znalostních grafů a podo
 | RQ7 | Jaké dotazy a následné analýzy mají být nad výsledkem možné? |
 | RQ8 | Jak náročné je jednotlivé reprezentace implementovat, měnit a provozovat? |
 | RQ9 | Lze přínos grafu prokázat měřitelným experimentem se stejnými daty? |
+| RQ10 | Jak mají být znalosti **správně zapisovány**: identifikátory, syntaxe RDF/Turtle/JSON-LD, ontologie, datové typy, provenienční metadata, validace a sémantika? |
 
 ### 1.3 Očekávané výstupy této fáze
 
@@ -56,6 +57,7 @@ Vedoucí zadal jako první úkol **podrobnou analýzu znalostních grafů a podo
 - **Požadavky:** typy extrahovaných faktů a scénáře, které s nimi chce systém řešit.
 - **Srovnání:** přehled možností, omezení a složitosti jednotlivých přístupů.
 - **Praktické příklady:** stejný fakt/událost v JSON, SQL, RDF a Property Graphu.
+- **Analýza zápisu:** konkrétní syntaktické ukázky (Turtle, JSON-LD, Cypher), pravidla ontologie, validace a neztrátového převodu mezi reprezentacemi.
 - **Návrh pilotu:** jak porovnat vhodnost reprezentací bez zkreslení kvalitou extrakce.
 - **Zdůvodněný závěr:** kdy je KG vhodný, případně který model zvolit a proč.
 
@@ -295,6 +297,28 @@ RDF používá trojice **subject – predicate – object** (subjekt, predikát,
 Zvolená reprezentace by měla zvládnout situaci, kdy **dva dokumenty tvrdí různé informace o téže věci**, aniž by jeden z nich systém automaticky zahodil.
 
 **Nastudovat rozdíl:** událost je popisem toho, co se podle zdroje stalo; tvrzení je záznam o tom, co zdroj o události říká. Událost i tvrzení mohou být samostatné objekty.
+
+### 5.4 Správný zápis: syntaxe, sémantika a validace
+
+Nestačí porovnat **tvar grafu (uzly, hrany, trojice)**. Pro diplomku je nutné analyzovat také **způsob zápisu konkrétních znalostí**, jeho význam a to, jak lze zapsané znalosti validovat a neztrátově exportovat.
+
+**Samostatná podrobná analýza:** [Zápis znalostního grafu – syntaxe, sémantika, serializace a validace](docs/knowledge_graph_serialization.md). Obsahuje skutečné příklady jedné historické události v **RDF/Turtle**, **JSON-LD** a **Property Graph/Cypher**, ukázku **SHACL**, kontrast přímé hrany a uzlu tvrzení i příklad dvou rozporných zdrojů.
+
+Rozlišovat zejména:
+
+| Vrstva | Příklad otázky | Konkrétní téma |
+|---|---|---|
+| Konceptuální a datový model | Co je entita, zmínka, událost a tvrzení? | RDF vs. Property Graph, event/claim-centric |
+| Syntaxe a serializace | Jak se informace přesně zapisuje? | Turtle, TriG, JSON-LD, vlastní JSON, import přes Cypher |
+| Identita a sémantika | Co **znamená** daný predikát a jak poznáme tentýž objekt? | Stabilní IRI/ID, typy, ontologie, význam vztahů |
+| Datové typy a čas | Jak zachováme rok, interval, jazyk a neurčitost? | `xsd:gYear`, jazykové literály, časové kvalifikátory |
+| Provenance a rozpory | Jak doložit a případně opravit extrahovaný údaj? | Dokument, pasáž, verze OCR, samostatná tvrzení |
+| Validace | Je zápis nejen parsovatelný, ale i doménově správný? | RDF parser, SHACL, JSON Schema, DB constraints, evidence |
+| Přenositelnost | Přenese se celý význam mezi formáty a úložišti? | RDF ↔ JSON-LD, mapování RDF ↔ Property Graph |
+
+**Pozor:** JSON je syntaxe, RDF a Property Graph jsou datové modely a Neo4j/PostgreSQL jsou úložiště. Srovnávat tyto kategorie napřímo by zkreslilo výsledek analýzy.
+
+**Kontrolní otázka pro experiment:** Lze z grafu bez ztráty zrekonstruovat *kdo podle kterého zdroje vykonal jakou roli v události, kdy, s jakou nejistotou a s jakou konkrétní textovou evidencí*?
 
 ---
 
@@ -756,6 +780,7 @@ Každému hodnocení 1–5 přiřadit **zdůvodnění a důkaz**. Nedoložené b
 - [ ] Přečíst základní survey *Knowledge Graphs* (Hogan et al.).
 - [ ] Vysvětlit všechny důležité termíny a jejich rozdíly.
 - [ ] Zvládnout RDF triple / IRI / named graph.
+- [ ] Ověřit **skutečnou RDF syntaxi** na Turtle a JSON-LD, datové typy a smysl IRI/ontologie.
 - [ ] Zvládnout Property Graph / uzel / hranu / atribut.
 - [ ] Na jednom příkladu porovnat RDF, Property Graph a SQL.
 - [ ] Pochopit datový model vs. serializaci vs. engine.
@@ -768,6 +793,8 @@ Každému hodnocení 1–5 přiřadit **zdůvodnění a důkaz**. Nedoložené b
 - [ ] Relační schéma, SQL JOIN, rekurzivní dotazy.
 - [ ] RDF + SPARQL.
 - [ ] Property Graph + Cypher/GQL.
+- [ ] Prostudovat syntaxe a pravidla zápisu podle [analýzy serializace a validace](docs/knowledge_graph_serialization.md).
+- [ ] U stejné události porovnat Turtle, JSON-LD a zápis/import Property Graphu; ověřit převod bez ztráty významu.
 - [ ] Event-centric a claim-centric návrh.
 - [ ] Hypergraf a hybridní model.
 
@@ -778,6 +805,7 @@ Každému hodnocení 1–5 přiřadit **zdůvodnění a důkaz**. Nedoložené b
 - [ ] Historická čeština a problémy OCR.
 - [ ] Entity resolution, aliasy, duplicity, nejisté identity.
 - [ ] Provenance a PROV-O.
+- [ ] Definovat a ověřit pravidla zápisu zdrojových tvrzení, typů dat, důkazů a schématové validace (např. SHACL).
 - [ ] Konfliktní a nejistá tvrzení.
 - [ ] Časové údaje a intervaly.
 - [ ] CIDOC CRM / event-centric modely.
@@ -969,7 +997,7 @@ Hledat zejména v **ACL Anthology, ACM Digital Library, IEEE Xplore, SpringerLin
 ### 18.3 Nejdůležitější nejbližší kroky
 
 1. Přečíst *Knowledge Graphs* (Hogan et al.) a vysvětlit RDF vs. Property Graph.
-2. Vybrat jednu **konkrétní historickou událost** a zapsat ji do JSON, SQL, RDF a Property Graphu.
+2. Vybrat jednu **konkrétní historickou událost** a zapsat ji do JSON, SQL, RDF a Property Graphu, **včetně syntaxe Turtle/JSON-LD/Cypher**, identifikátorů, datových typů a validace.
 3. U každé varianty ověřit uložení **role účastníků, času, zdrojové pasáže a nejistoty**.
 4. S vedoucím potvrdit **očekávané dotazy a účel výsledné reprezentace**.
 5. Podle toho zvolit srovnávací kritéria a rozhodnout, zda je nutný malý experiment.
