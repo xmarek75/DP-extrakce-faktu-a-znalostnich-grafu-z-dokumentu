@@ -1,4 +1,9 @@
-/** Generuje tři ilustrační animace pro knowledge_graphs_analysis.md.\n * Použití: node scripts/generate_kg_animations.js (Node.js, bez závislostí).\n */\nconst fs = require('fs');\nconst path = require('path');\nconst files = (function generateGifs(){
+/** Generuje tři ilustrační animace pro knowledge_graphs_analysis.md.
+ * Použití: node scripts/generate_kg_animations.js (Node.js, bez závislostí).
+ */
+const fs = require('fs');
+const path = require('path');
+const files = (function generateGifs(){
  const W=720,H=352;
  const pal=[
  [11,18,32],[23,36,58],[57,76,105],[241,246,255],
@@ -151,4 +156,9 @@
  "docs/images/kg_entity_resolution.gif":make([0,1,2,3,4].map(entity)),
  "docs/images/kg_conflicting_sources.gif":make([0,1,2,3,4].map(provenance))
  };
-})();\nfor (const [name, file] of Object.entries(files)) {\n  fs.mkdirSync(path.dirname(name), {recursive:true});\n  fs.writeFileSync(name, Buffer.from(file.base64, 'base64'));\n  console.log(name + ' (' + file.size + ' bytes)');\n}\n
+})();
+for (const [name, file] of Object.entries(files)) {
+  fs.mkdirSync(path.dirname(name), {recursive:true});
+  fs.writeFileSync(name, Buffer.from(file.base64, 'base64'));
+  console.log(name + ' (' + file.size + ' bytes)');
+}
