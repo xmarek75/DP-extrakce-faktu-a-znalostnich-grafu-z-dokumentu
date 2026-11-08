@@ -1,0 +1,4 @@
+# Local environment configuration
+.agents/
+.aws/
+.codex/
