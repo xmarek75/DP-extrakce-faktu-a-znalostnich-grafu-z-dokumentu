@@ -244,3 +244,6 @@ Historické dokumenty
 Znalostní graf má největší potenciál tam, kde je cílem **propojovat fakta z více dokumentů a dotazovat se na jejich vztahy**. Volba grafové reprezentace však sama neřeší správnost extrakce ani sjednocování identit.
 
 Pro další práci se jeví jako rozumné **prototypovat jednodušší event-centric Property Graph** a porovnat jeho možnosti s modelem založeným na vybraných částech CIDOC CRM. Konečné rozhodnutí by mělo vycházet z reálného vzorku dokumentů, typických dotazů a experimentálního vyhodnocení.
+
+
+Omluva z dnešní konzultace
