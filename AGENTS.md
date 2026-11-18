@@ -35,7 +35,7 @@ Dokumenty (text / OCR)
     -> vlastní strukturovaný JSON
     -> validace schématu i odkazů a důkazů
     -> normalizace a entity resolution
-    -> mapování vybraných pojmů na CIDOC CRM
+    -> mapování na CIDOC CRM nebo schválené vlastní rozšíření ontologie
     -> Property Graph uložený v Neo4j
     -> Cypher dotazy, vizualizace, později GraphRAG
 ```
@@ -64,7 +64,8 @@ Implementuj postupně:
 4. Přidej ukázkové Cypher dotazy: účastníci události, čas, převáděný objekt, původ tvrzení a propojení mezi dokumenty.
 5. Následně přidej **LLM -> JSON** extrakci jako samostatnou vyměnitelnou komponentu. Ukládej syrový kandidátní výstup pro audit a srovnání.
 6. Doplň základní normalizaci a konzervativní entity resolution; nejednoznačné případy ponech nesloučené.
-7. Přidej testy a stručný návod, jak demo spustit a jak ověřit očekávané výsledky.
+7. Připrav registr typů a vztahů s mapováním na CIDOC CRM; pro nepokryté případy umožni evidovat návrhy nových vztahů k revizi. Plně automatizované návrhy pomocí LLM až po zprovoznění základního grafu.
+8. Přidej testy a stručný návod, jak demo spustit a jak ověřit očekávané výsledky.
 
 Nejdříve zajisti průchod malou ukázkou *end-to-end*. Teprve poté rozšiřuj rozsah entit a událostí, podporu OCR/HTR, pokročilé ontologické mapování a evaluační experimenty.
 
@@ -81,8 +82,36 @@ Pokud v repozitáři již existuje kód k danému kroku, **navazuj na něj**, ne
 - Aplikační vztahy typu `SUPPORTED_BY` nebo `FOUND_IN` označ jako **vlastní**, nikoli jako oficiální vlastnosti CIDOC CRM.
 - Používej stabilní ID; lidsky čitelný název nebo jméno osoby není primární identifikátor.
 - Lokální ID vytvořená při extrakci nesmí být bez dalšího považována za globální identity.
-- Vlastnosti a vztahy měj typované; neumožňuj LLM vymýšlet libovolné názvy hran bez validační vrstvy.
+- Vlastnosti a vztahy měj typované; LLM může **navrhnout** nové typy, ale smí používat v hlavním grafu pouze již schválené typy podle registru.
 - Zajisti idempotentní import (opakované spuštění nesmí vytvářet duplicitní graf).
+
+### Hybridní ontologie: CIDOC CRM + vlastní schválená rozšíření
+
+**Architektonické rozhodnutí:** CIDOC CRM použij jako **výchozí referenční ontologii** tam, kde její význam odpovídá extrahované informaci. Pokud vhodný typ nebo vztah nenajdeš, umožni LLM navrhnout nový **aplikační** typ/vztah. **Neschválené návrhy nikdy automaticky nezařazuj do hlavního grafového schématu.** Nerozšiřuj přímo oficiální CIDOC CRM; vlastní pojmy udržuj v odděleném, jednoznačně označeném namespace a registru.
+
+Při zpracování extrahovaného faktu postupuj takto:
+
+1. **Rozpoznání významu:** z textu extrahuj entity, role, vztahy a události včetně důkazu; nerozhoduj o typu jen podle podobnosti názvu.
+2. **Vyhledání existujícího typu:** nejprve hledej ve schváleném registru používaných CIDOC CRM tříd a vlastností; ověř **doménu, obor hodnot, směr hrany a význam**. Pokud lokální podmnožina nestačí, ověř, zda vhodný pojem existuje v širší použité verzi CIDOC CRM. „Není v našem registru“ neznamená „neexistuje v CIDOC CRM“.
+3. **Existující standard:** je-li sémanticky odpovídající pojem k dispozici, použij jej prostřednictvím dokumentovaného mapování. Nevytvářej duplicitní vlastní vztah.
+4. **Chybějící standardní pojem:** pokud standard neposkytuje přímou odpovídající reprezentaci, může LLM navrhnout nový typ (např. `FRIEND_OF`) jako **kandidáta**. Zkontroluj i možnost modelování pomocí existující události či kombinace vztahů.
+5. **Kontrola kandidáta:** porovnej se stávajícími typy a synonymy, ověř doložitelnost, negaci, význam, doménu/obor hodnot, směr, symetrii a případné inverzní vztahy; řeš názvové i sémantické duplicity.
+6. **Schválení:** kandidát nech ve stavu `proposed`/`requires_review`, dokud jej neschválí explicitní kontrolní krok (v MVP člověk). Neschválený typ nesmí LLM samo publikovat jako novou závaznou hranu ani trvale měnit ontologii.
+7. **Registrace a další použití:** schválený typ ulož do **verzovaného registru** vlastní ontologie s odděleným namespace (např. `dp:friendOf`). Od dalšího zpracování se stává standardní možností pro extrakci, validaci a generování dotazů.
+8. **Nejisté případy:** pokud není rozhodnuto o mapování nebo typu, zachovej výsledek v kandidátním JSON, důkaz a stav revize. Nevytvářej nahodilé typy hran v Neo4j.
+
+Pro každý typ v registru eviduj alespoň:
+- jednoznačné interní ID / URI, čitelný název, definici a stav (`approved`, `proposed`, `rejected`, `deprecated`);
+- původ (`cidoc` nebo `custom`), **konkrétní verzi CIDOC CRM** a oficiální identifikátor, pokud existuje;
+- povolené typy zdrojového a cílového uzlu, směr vztahu, případnou symetrii a inverzi;
+- alternativní názvy/synonyma, odkazy na zdrojový důkaz a důvod vytvoření vlastního typu;
+- verzi schématu, datum schválení a kompatibilitu s existujícími uloženými daty.
+
+**Pozor na úrovně modelu:** „kupující“ v textu nemusí znamenat přímou hranu `Person -> Building`. U koupě používej odpovídající **událost** (např. `E8 Acquisition` s `P22`, `P23`, `P24`), pokud tím správně zachytíš význam. Oproti tomu `FRIEND_OF` je příklad hypotetického **vlastního** vztahu, nikoli tvrzení, že CIDOC CRM neobsahuje žádný použitelný způsob modelování sociálních vazeb.
+
+**Konzistence AI dotazování:** LLM agent generující Cypher musí dostávat **aktuální schválené schéma/registr** (včetně názvů Neo4j hran a jejich významu). To, že dotazy vytváří AI, neodstraňuje potřebu pevné sémantiky, validace a provenance.
+
+Pro první MVP stačí **ručně definovaný malý schválený registr** a ukládání návrhů k revizi. Automatizované vyhledávání v celé CIDOC CRM, porovnávání kandidátů s ontologií a UI pro schvalování jsou **pozdější samostatné kroky**, nikoli podmínka pro import prvního grafu.
 
 ### Historická přesnost a nejistota
 
@@ -126,6 +155,7 @@ src/kg_pipeline/
     normalization/
     resolution/
     graph/
+    ontology/        # registr mapování a kandidátních typů (až při implementaci)
 tests/
     fixtures/
 examples/
@@ -146,6 +176,8 @@ Pro každou implementovanou část ověř:
 4. Ze zobrazeného tvrzení lze dohledat zdrojový dokument a přesný použitý textový důkaz.
 5. Dvě zmínky se neslučují bez dostatečných dokladů totožnosti.
 6. Neznámá nebo přibližná datace nezíská uměle vyšší přesnost.
+7. Existující pojem CIDOC CRM má přednost před duplicitním vlastním typem; ověřuje se sémantika a směr vztahu.
+8. Nově navržený vztah zůstane do schválení pouze kandidátem, nepřibude jako nový typ hrany v hlavním grafu; schválený typ se konzistentně používá při dalším importu.
 
 Při dokončení úkolu:
 - spusť relevantní testy (např. `python -m pytest`, pokud je projekt již nakonfigurován);
