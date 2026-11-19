@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=75,<82"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kg-pipeline-prototype"
+version = "0.2.3"
+description = "Ověřitelný prototyp znalostního grafu z historicky stylizovaných dokumentů"
+requires-python = ">=3.11"
+dependencies = [
+    "pydantic>=2.10,<3",
+    "neo4j>=5.26,<6",
+    "python-dotenv>=1,<2",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10"]
+
+[project.scripts]
+kg-pipeline = "kg_pipeline.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+kg_pipeline = ["queries/*.cypher"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-ra"
+markers = ["integration: vyžaduje explicitně povolené připojení k Neo4j"]

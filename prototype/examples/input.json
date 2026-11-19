@@ -1,0 +1,9 @@
+{
+  "dataset_id": "synthetic-ollama",
+  "dataset_version": "1.0.0",
+  "documents": [
+    {"id": "doc_001", "source_file": "documents/doc_001.txt", "synthetic": true},
+    {"id": "doc_002", "source_file": "documents/doc_002.txt", "synthetic": true},
+    {"id": "doc_003", "source_file": "documents/doc_003.txt", "synthetic": true}
+  ]
+}

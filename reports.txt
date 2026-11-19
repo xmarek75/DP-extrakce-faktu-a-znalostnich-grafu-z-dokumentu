@@ -1,0 +1,31 @@
+Report 1
+
+Dokončil jsem:
+- Připravil jsem úvodní analýzu možností reprezentace faktů extrahovaných z dokumentů. Porovnal jsem relační databáze, JSON, RDF a Property Graph
+  z hlediska vyjádření vztahů, propojení informací mezi dokumenty a náročnosti dalšího zpracování.
+  https://github.com/xmarek75/DP-extrakce-faktu-a-znalostnich-grafu-z-dokumentu/blob/main/knowledge_graphs_analysis.md
+- Zpracoval jsem přehled možností správného zápisu znalostních grafů. Na stejném příkladu jsem porovnal RDF/Turtle, JSON-LD
+  a Property Graph/Cypher a zaměřil se na rozdíl mezi syntaxí, významem vztahů a validací dat, včetně zachování informace
+  o zdroji tvrzení (provenience).
+  https://github.com/xmarek75/DP-extrakce-faktu-a-znalostnich-grafu-z-dokumentu/blob/main/docs/knowledge_graph_serialization.md
+
+Report 2
+
+Dokončil jsem:
+- Prošel jsem vybrané části specifikace CIDOC CRM se zaměřením na reprezentaci historických událostí (event-centric modelování).
+  Zkoumal jsem, jak lze propojit osoby, místa, časové údaje a události, a porovnával jsem tento přístup s jednodušším Property Graphem.
+  Průběžné poznámky a návrh možného využití vlastní zjednodušené ontologie mám v notes1.md.
+  https://cidoc-crm.org/html/cidoc_crm_v7.3.2.html
+  https://github.com/xmarek75/DP-extrakce-faktu-a-znalostnich-grafu-z-dokumentu/blob/main/notes1.md
+- Porovnal jsem, jak RDF a Property Graph zacházejí s neúplnými informacemi. Na příkladu narození osoby bez známého místa nebo data jsem řešil,
+  jak událost reprezentovat tak, aby bylo možné chybějící údaje později doplnit.
+  https://github.com/xmarek75/DP-extrakce-faktu-a-znalostnich-grafu-z-dokumentu/blob/main/notes1.md
+- Zabýval jsem se využitím znalostních grafů v RAG/GraphRAG systémech. Zaměřil jsem se na to, kdy může propojení entit a vztahů napříč
+  dokumenty přinést výhodu oproti vyhledávání pouze podle textové podobnosti. Výchozím zdrojem byla
+  práce Edge et al. (2024), From Local to Global: A Graph RAG Approach to Query-Focused Summarization.
+  https://arxiv.org/abs/2404.16130
+
+Pracuji na:
+- Vyhodnocení, zda pro plánované zpracování historických dokumentů použít existující ontologii CIDOC CRM,
+  vlastní zjednodušený model inspirovaný CIDOC CRM, nebo jednodušší reprezentaci faktů.
+  Důležitými kritérii jsou zejména propojení informací mezi dokumenty, zachování zdrojů tvrzení a složitost implementace.

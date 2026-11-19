@@ -1,0 +1,606 @@
+{
+  "$defs": {
+    "Acquisition": {
+      "additionalProperties": false,
+      "properties": {
+        "local_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+          "title": "Local Id",
+          "type": "string"
+        },
+        "type": {
+          "const": "Acquisition",
+          "title": "Type",
+          "type": "string"
+        },
+        "status": {
+          "default": "requires_review",
+          "enum": [
+            "accepted",
+            "requires_review",
+            "unsupported_type",
+            "rejected"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "assertion": {
+          "default": "affirmed",
+          "enum": [
+            "affirmed",
+            "negated",
+            "uncertain",
+            "attributed"
+          ],
+          "title": "Assertion",
+          "type": "string"
+        },
+        "acquirer": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Acquirer"
+        },
+        "former_owner": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Former Owner"
+        },
+        "transferred_object": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+          "title": "Transferred Object",
+          "type": "string"
+        },
+        "time": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TimeSpan"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "evidence_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "local_id",
+        "type",
+        "transferred_object",
+        "evidence_ids"
+      ],
+      "title": "Acquisition",
+      "type": "object"
+    },
+    "Candidate": {
+      "additionalProperties": false,
+      "description": "Nepodporované informace a návrhy typů; nikdy se neimportují jako hrany.",
+      "properties": {
+        "local_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+          "title": "Local Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "claim",
+            "type_proposal"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "proposed_type": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Proposed Type",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "requires_review",
+            "unsupported_type",
+            "rejected"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "description": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Description",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "local_id",
+        "kind",
+        "proposed_type",
+        "status",
+        "description",
+        "evidence_ids"
+      ],
+      "title": "Candidate",
+      "type": "object"
+    },
+    "Document": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+          "title": "Id",
+          "type": "string"
+        },
+        "source_file": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Source File",
+          "type": "string"
+        },
+        "synthetic": {
+          "title": "Synthetic",
+          "type": "boolean"
+        },
+        "entities": {
+          "items": {
+            "$ref": "#/$defs/Entity"
+          },
+          "title": "Entities",
+          "type": "array"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "events": {
+          "items": {
+            "$ref": "#/$defs/Acquisition"
+          },
+          "title": "Events",
+          "type": "array"
+        },
+        "candidates": {
+          "items": {
+            "$ref": "#/$defs/Candidate"
+          },
+          "title": "Candidates",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "source_file",
+        "synthetic",
+        "entities",
+        "evidence",
+        "events"
+      ],
+      "title": "Document",
+      "type": "object"
+    },
+    "Entity": {
+      "additionalProperties": false,
+      "properties": {
+        "local_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+          "title": "Local Id",
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "Person",
+            "PhysicalThing"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "label": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Label",
+          "type": "string"
+        },
+        "status": {
+          "default": "requires_review",
+          "enum": [
+            "accepted",
+            "requires_review",
+            "unsupported_type",
+            "rejected"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "local_id",
+        "type",
+        "label",
+        "evidence_ids"
+      ],
+      "title": "Entity",
+      "type": "object"
+    },
+    "EntityRef": {
+      "additionalProperties": false,
+      "properties": {
+        "document_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+          "title": "Document Id",
+          "type": "string"
+        },
+        "entity_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+          "title": "Entity Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "document_id",
+        "entity_id"
+      ],
+      "title": "EntityRef",
+      "type": "object"
+    },
+    "Evidence": {
+      "additionalProperties": false,
+      "properties": {
+        "local_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+          "title": "Local Id",
+          "type": "string"
+        },
+        "text": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Text",
+          "type": "string"
+        },
+        "start": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start"
+        },
+        "end": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "End"
+        }
+      },
+      "required": [
+        "local_id",
+        "text"
+      ],
+      "title": "Evidence",
+      "type": "object"
+    },
+    "EvidenceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "document_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+          "title": "Document Id",
+          "type": "string"
+        },
+        "evidence_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+          "title": "Evidence Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "document_id",
+        "evidence_id"
+      ],
+      "title": "EvidenceRef",
+      "type": "object"
+    },
+    "IdentityLink": {
+      "additionalProperties": false,
+      "properties": {
+        "local_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+          "title": "Local Id",
+          "type": "string"
+        },
+        "left": {
+          "$ref": "#/$defs/EntityRef"
+        },
+        "right": {
+          "$ref": "#/$defs/EntityRef"
+        },
+        "status": {
+          "enum": [
+            "accepted",
+            "requires_review",
+            "rejected"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Reason",
+          "type": "string"
+        },
+        "reviewed_by": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "pattern": "\\S",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reviewed By"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceRef"
+          },
+          "minItems": 1,
+          "title": "Evidence",
+          "type": "array"
+        }
+      },
+      "required": [
+        "local_id",
+        "left",
+        "right",
+        "status",
+        "reason",
+        "evidence"
+      ],
+      "title": "IdentityLink",
+      "type": "object"
+    },
+    "RunProvenance": {
+      "additionalProperties": false,
+      "properties": {
+        "run_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+          "title": "Run Id",
+          "type": "string"
+        },
+        "extraction_method": {
+          "const": "ollama_pipeline",
+          "title": "Extraction Method",
+          "type": "string"
+        },
+        "pipeline_version": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Pipeline Version",
+          "type": "string"
+        },
+        "prompt_version": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Prompt Version",
+          "type": "string"
+        },
+        "acceptance_policy": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Acceptance Policy",
+          "type": "string"
+        },
+        "created_at": {
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Created At",
+          "type": "string"
+        },
+        "models": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Models",
+          "type": "object"
+        },
+        "model_digests": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Model Digests",
+          "type": "object"
+        },
+        "audit_manifest": {
+          "default": "run.json",
+          "minLength": 1,
+          "pattern": "\\S",
+          "title": "Audit Manifest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "run_id",
+        "extraction_method",
+        "pipeline_version",
+        "prompt_version",
+        "acceptance_policy",
+        "created_at",
+        "models",
+        "model_digests"
+      ],
+      "title": "RunProvenance",
+      "type": "object"
+    },
+    "TimeSpan": {
+      "additionalProperties": false,
+      "properties": {
+        "original_text": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "pattern": "\\S",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Original Text"
+        },
+        "year": {
+          "anyOf": [
+            {
+              "maximum": 9999,
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Year"
+        },
+        "precision": {
+          "enum": [
+            "year",
+            "unknown"
+          ],
+          "title": "Precision",
+          "type": "string"
+        },
+        "approximate": {
+          "default": false,
+          "title": "Approximate",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "precision"
+      ],
+      "title": "TimeSpan",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "enum": [
+        "1.0.0",
+        "1.1.0"
+      ],
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "registry_version": {
+      "const": "1.0.0",
+      "title": "Registry Version",
+      "type": "string"
+    },
+    "dataset_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+      "title": "Dataset Id",
+      "type": "string"
+    },
+    "dataset_version": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+      "title": "Dataset Version",
+      "type": "string"
+    },
+    "documents": {
+      "items": {
+        "$ref": "#/$defs/Document"
+      },
+      "minItems": 1,
+      "title": "Documents",
+      "type": "array"
+    },
+    "identity_links": {
+      "items": {
+        "$ref": "#/$defs/IdentityLink"
+      },
+      "title": "Identity Links",
+      "type": "array"
+    },
+    "provenance": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RunProvenance"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "schema_version",
+    "registry_version",
+    "dataset_id",
+    "dataset_version",
+    "documents"
+  ],
+  "title": "Dataset",
+  "type": "object"
+}

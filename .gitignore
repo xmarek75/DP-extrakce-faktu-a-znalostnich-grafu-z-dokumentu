@@ -2,3 +2,8 @@
 .agents/
 .aws/
 .codex/
+
+# Lokální konfigurace s tajnými údaji; verzovat lze pouze prázdný vzor.
+.env
+.env.*
+!.env.example

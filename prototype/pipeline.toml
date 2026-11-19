@@ -1,0 +1,23 @@
+# Každá role může používat jiný lokálně stažený model.
+# Pro první běh stačí jeden model; nezávislost rolí neznamená nezávislost chyb.
+base_url = "http://127.0.0.1:11434"
+timeout_seconds = 300
+max_attempts = 2
+max_document_chars = 8000
+max_identity_context_chars = 18000
+# Automatické přijetí až po modelové revizi A deterministických kontrolách.
+# "manual" ponechá všechny extrakce k lidské revizi.
+acceptance = "model_review"
+
+[models.entities]
+model = "qwen2.5:3b"
+
+[models.events]
+model = "qwen2.5:3b"
+
+[models.review]
+# Zde lze nastavit například jiný, silnější stažený model.
+model = "qwen2.5:3b"
+
+[models.identity]
+model = "qwen2.5:3b"

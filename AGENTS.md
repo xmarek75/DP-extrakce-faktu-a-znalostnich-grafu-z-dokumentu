@@ -5,7 +5,7 @@
 Tento repozitář slouží k diplomové práci **„Extrakce faktů a znalostních grafů z dokumentů“** (FIT VUT). Cílem je navrhnout, implementovat a experimentálně vyhodnotit systém, který z dokumentů získává strukturované informace a vytváří znalostní graf umožňující dotazování i propojení informací mezi dokumenty.
 
 Zaměření:
-- historické dokumenty, zejména 15.–16. století, a novější tištěné dokumenty;
+- historické dokumenty
 - vstupní texty mohou pocházet z OCR/HTR a obsahovat chyby;
 - extrakce pojmenovaných entit, vztahů, událostí, rolí, času a souvisejících faktů;
 - správnost, dohledatelnost důkazů, sjednocování identit mezi dokumenty;
